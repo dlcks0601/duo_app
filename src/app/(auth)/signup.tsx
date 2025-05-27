@@ -1,11 +1,11 @@
-import { login } from '@/apis/auth.api';
 import { AppText } from '@/components/AppText';
 import AuthInput from '@/components/auth/AuthInput';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuthStore } from '@/store/authStore';
-import { Link } from 'expo-router';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,30 +25,6 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { logIn } = useAuthStore();
-  const handleLogin = () => {
-    const idTrimmed = id.trim();
-    const isIdEmpty = idTrimmed === '';
-    const isPasswordEmpty = password === '';
-
-    setIdError(isIdEmpty);
-    setPasswordError(isPasswordEmpty);
-
-    if (isIdEmpty || isPasswordEmpty) {
-      setError('아이디와 패스워드를 모두 입력해주세요.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    login(idTrimmed, password)
-      .then(({ user, jwt }) => logIn(user, jwt))
-      .then(() => console.log('로그인 성공'))
-      .catch((err: any) => {
-        console.error(err);
-        setError(err.response?.data?.message || err.message || '로그인 실패');
-      })
-      .finally(() => setLoading(false));
-  };
 
   return (
     <KeyboardAvoidingView
@@ -68,7 +44,7 @@ export default function LoginScreen() {
                 <AppText className='text-4xl font-logo'>Our</AppText>
                 <AppText className='text-4xl font-logo mt-[-11px]'>Own</AppText>
               </View>
-              {/* 로그인 폼 */}
+              {/* 회원가입 폼 */}
               <View className='flex-col w-full mt-10 gap-2'>
                 <AuthInput
                   label='아이디'
@@ -94,38 +70,38 @@ export default function LoginScreen() {
                 />
               </View>
 
-              {/* 로그인 버튼 */}
+              {/* 다음 버튼 */}
               <View className='w-full mt-8'>
-                <TouchableOpacity
-                  className={`rounded-md py-5 ${isDark ? 'bg-white' : 'bg-black'}`}
-                  onPress={handleLogin}
-                  disabled={loading}
-                >
-                  <Text
-                    className={`${isDark ? 'text-black' : 'text-white'} text-center`}
+                {id && password ? (
+                  <TouchableOpacity
+                    className={`rounded-md py-5 ${isDark ? 'bg-white' : 'bg-black'}`}
+                    onPress={() => {
+                      Alert.alert('회원가입', '다음 단계로 이동하시겠습니까?', [
+                        {
+                          text: '취소',
+                          style: 'destructive',
+                        },
+                        {
+                          text: '확인',
+                          onPress: () => router.push('/nickname'),
+                        },
+                      ]);
+                    }}
                   >
-                    로그인
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View className='flex-row w-full justify-center gap-4 mt-8'>
-                {/* 회원가입 버튼 */}
-                <Link href='/signup' asChild>
-                  <TouchableOpacity>
-                    <AppText
-                      className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500  '}`}
+                    <Text
+                      className={`${isDark ? 'text-black' : 'text-white'} text-center`}
                     >
-                      회원가입
-                    </AppText>
+                      다음
+                    </Text>
                   </TouchableOpacity>
-                </Link>
-                <TouchableOpacity>
-                  <AppText
-                    className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
+                ) : (
+                  <TouchableOpacity
+                    className='rounded-md py-5 bg-gray-300'
+                    disabled={true}
                   >
-                    아이디 찾기
-                  </AppText>
-                </TouchableOpacity>
+                    <Text className='text-gray-500 text-center'>다음</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>

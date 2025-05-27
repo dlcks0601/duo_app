@@ -1,7 +1,7 @@
 import { login } from '@/apis/auth.api';
 import { AppText } from '@/components/AppText';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 // import { Button } from '@/components/Button';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -24,15 +24,15 @@ export default function IndexScreen() {
           <AppText className='text-4xl font-logo mt-[-11px]'>Own</AppText>
         </View>
       </View>
-      {/* <Button title='로그인' theme='secondary' onPress={handleLogin} /> */}
-      <TouchableOpacity
-        onPress={() => router.push('/login')}
-        className={`px-10 py-6 items-center justify-center rounded-md ${isDark ? 'bg-white' : 'bg-black'}`}
-      >
-        <Text className={isDark ? 'text-black' : 'text-white'}>
-          이메일 계정으로 로그인
-        </Text>
-      </TouchableOpacity>
+      <Link href='/login' asChild>
+        <TouchableOpacity
+          className={`px-10 py-6 items-center justify-center rounded-md ${isDark ? 'bg-white' : 'bg-black'}`}
+        >
+          <Text className={isDark ? 'text-black' : 'text-white'}>
+            이메일 계정으로 시작하기
+          </Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }
