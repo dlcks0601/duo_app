@@ -3,9 +3,10 @@ import AuthInput from '@/components/auth/AuthInput';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuthStore } from '@/store/authStore';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -16,15 +17,36 @@ import {
 } from 'react-native';
 
 export default function SignupScreen() {
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [idError, setIdError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { logIn } = useAuthStore();
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -35,6 +57,7 @@ export default function SignupScreen() {
       <ScrollView
         keyboardShouldPersistTaps='handled'
         contentContainerStyle={{ marginTop: 60 }}
+        scrollEnabled={isKeyboardVisible}
       >
         <SafeAreaView className='flex-1'>
           <View className='flex-1 justify-center px-8'>
@@ -47,12 +70,12 @@ export default function SignupScreen() {
               {/* 회원가입 폼 */}
               <View className='flex-col w-full mt-10 gap-2'>
                 <AuthInput
-                  label='아이디'
-                  placeholder='아이디를 입력해주세요.'
-                  value={id}
+                  label='이메일'
+                  placeholder='이메일을 입력해주세요.'
+                  value={email}
                   onChangeText={(text) => {
-                    setId(text);
-                    if (text.trim()) setIdError(false);
+                    setEmail(text);
+                    if (text.trim()) setEmailError(false);
                   }}
                   keyboardType='default'
                   required
@@ -72,7 +95,7 @@ export default function SignupScreen() {
 
               {/* 다음 버튼 */}
               <View className='w-full mt-8'>
-                {id && password ? (
+                {email && password ? (
                   <TouchableOpacity
                     className={`rounded-md py-5 ${isDark ? 'bg-white' : 'bg-black'}`}
                     onPress={() => {
