@@ -1,18 +1,14 @@
-import { login } from '@/apis/auth.api';
 import { AppText } from '@/components/AppText';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Link, useRouter } from 'expo-router';
-// import { Button } from '@/components/Button';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 export default function IndexScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const handleLogin = async () => {
-    const response = await login('test', 'test');
-    console.log(response);
-  };
+  const handleGoogleLogin = () => {};
 
   const router = useRouter();
 
@@ -24,15 +20,18 @@ export default function IndexScreen() {
           <AppText className='text-4xl font-logo mt-[-11px]'>Own</AppText>
         </View>
       </View>
-      <Link href='/login' asChild>
-        <TouchableOpacity
-          className={`px-10 py-6 items-center justify-center rounded-md ${isDark ? 'bg-white' : 'bg-black'}`}
-        >
-          <Text className={isDark ? 'text-black' : 'text-white'}>
-            이메일 계정으로 시작하기
-          </Text>
-        </TouchableOpacity>
-      </Link>
+      <View className='flex-col gap-4'>
+        <GoogleLoginButton onPress={handleGoogleLogin} />
+        <Link href='/login' asChild>
+          <TouchableOpacity
+            className={`px-10 py-6 items-center justify-center rounded-md ${isDark ? 'bg-white' : 'bg-black'}`}
+          >
+            <Text className={isDark ? 'text-black' : 'text-white'}>
+              이메일 계정으로 시작하기
+            </Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
     </View>
   );
 }
