@@ -4,8 +4,9 @@ import AuthInput from '@/components/auth/AuthInput';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuthStore } from '@/store/authStore';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -16,31 +17,53 @@ import {
 } from 'react-native';
 
 export default function LoginScreen() {
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [idError, setIdError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { logIn } = useAuthStore();
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   const handleLogin = () => {
-    const idTrimmed = id.trim();
-    const isIdEmpty = idTrimmed === '';
+    const emailTrimmed = email.trim();
+    const isEmailEmpty = emailTrimmed === '';
     const isPasswordEmpty = password === '';
 
-    setIdError(isIdEmpty);
+    setEmailError(isEmailEmpty);
     setPasswordError(isPasswordEmpty);
 
-    if (isIdEmpty || isPasswordEmpty) {
+    if (isEmailEmpty || isPasswordEmpty) {
       setError('아이디와 패스워드를 모두 입력해주세요.');
       return;
     }
 
     setLoading(true);
     setError('');
-    login(idTrimmed, password)
+    login(emailTrimmed, password)
       .then(({ user, jwt }) => logIn(user, jwt))
       .then(() => console.log('로그인 성공'))
       .catch((err: any) => {
@@ -59,6 +82,7 @@ export default function LoginScreen() {
       <ScrollView
         keyboardShouldPersistTaps='handled'
         contentContainerStyle={{ marginTop: 60 }}
+        scrollEnabled={isKeyboardVisible}
       >
         <SafeAreaView className='flex-1'>
           <View className='flex-1 justify-center px-8'>
@@ -71,12 +95,12 @@ export default function LoginScreen() {
               {/* 로그인 폼 */}
               <View className='flex-col w-full mt-10 gap-2'>
                 <AuthInput
-                  label='아이디'
-                  placeholder='아이디를 입력해주세요.'
-                  value={id}
+                  label='이메일'
+                  placeholder='이메일을 입력해주세요.'
+                  value={email}
                   onChangeText={(text) => {
-                    setId(text);
-                    if (text.trim()) setIdError(false);
+                    setEmail(text);
+                    if (text.trim()) setEmailError(false);
                   }}
                   keyboardType='default'
                   required
@@ -113,7 +137,7 @@ export default function LoginScreen() {
                 <Link href='/signup' asChild>
                   <TouchableOpacity>
                     <AppText
-                      className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500  '}`}
+                      className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
                     >
                       회원가입
                     </AppText>
@@ -123,7 +147,7 @@ export default function LoginScreen() {
                   <AppText
                     className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}
                   >
-                    아이디 찾기
+                    이메일 찾기
                   </AppText>
                 </TouchableOpacity>
               </View>
