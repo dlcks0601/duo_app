@@ -8,6 +8,7 @@ export interface AuthState {
 }
 
 export interface User {
+  id?: string;
   nickname: string;
   role: string;
 }
@@ -26,4 +27,9 @@ export interface LoginResponse {
   message: MessageResponse;
   user: User;
   jwt: TokenResponse;
+}
+
+export interface SignupResponse {
+  message: MessageResponse;
+  user: User;
 }
