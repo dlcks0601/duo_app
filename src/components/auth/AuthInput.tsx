@@ -1,7 +1,7 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, TextInput, View } from 'react-native';
 
-type LoginInputProps = {
+type AuthInputProps = {
   label: string;
   placeholder?: string;
   value: string;
@@ -12,7 +12,7 @@ type LoginInputProps = {
   error?: string;
 };
 
-export default function LoginInput({
+export default function AuthInput({
   label,
   placeholder,
   value,
@@ -21,7 +21,7 @@ export default function LoginInput({
   keyboardType = 'default',
   required = false,
   error,
-}: LoginInputProps) {
+}: AuthInputProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
