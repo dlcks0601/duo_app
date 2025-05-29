@@ -16,6 +16,10 @@ import '../../global.css';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  // 카카오 sdk 초기화
+  // useEffect(() => {
+  //   initializeKakaoSDK('KAKAO_NATIVE_APP_KEY');
+  // });
   const [fontsLoaded] = useFonts({
     Pretendard: require('../../assets/fonts/Pretendard-Regular.otf'),
     'Pretendard-Thin': require('../../assets/fonts/Pretendard-Thin.otf'),

@@ -1,7 +1,7 @@
 import { AppText } from '@/components/AppText';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 export default function IndexScreen() {
@@ -9,8 +9,6 @@ export default function IndexScreen() {
   const isDark = colorScheme === 'dark';
 
   const handleGoogleLogin = () => {};
-
-  const router = useRouter();
 
   return (
     <View className='flex-1 justify-center mb-20 px-4'>
@@ -31,6 +29,22 @@ export default function IndexScreen() {
             </Text>
           </TouchableOpacity>
         </Link>
+        {/* 카카오 로그인 추가 */}
+        {/* <Button
+          title='카카오 로그인'
+          onPress={() =>
+            login()
+              .then((result) => {
+                console.log('로그인 성공:', result);
+                requestAnimationFrame(() => {
+                  router.push('/(auth)/login');
+                });
+              })
+              .catch(console.error)
+          }
+        />
+        <Button title={'logout'} onPress={() => logout().then(console.log)} />
+        <Button title={'unlink'} onPress={() => unlink().then(console.log)} /> */}
       </View>
     </View>
   );
