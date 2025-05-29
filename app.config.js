@@ -2,34 +2,69 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: 'duo_app',
-    slug: 'duo_app',
+    name: 'ourown',
+    slug: 'ourown',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'duoapp',
+    scheme: 'ourown',
     userInterfaceStyle: 'automatic',
-    splash: {
-      image: './assets/images/splash-icon.png',
-      resizeMode: 'contain',
-      backgroundColor: '#ffffff',
-    },
-    assetBundlePatterns: ['**/*'],
+    newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      bundleIdentifier: 'com.ourown',
     },
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
+      package: 'com.ourown',
+      edgeToEdgeEnabled: true,
     },
     web: {
       bundler: 'metro',
       output: 'static',
       favicon: './assets/images/favicon.png',
     },
-    plugins: ['expo-router'],
+    plugins: [
+      'expo-router',
+      [
+        'expo-splash-screen',
+        {
+          image: './assets/images/splash-icon.png',
+          imageWidth: 200,
+          resizeMode: 'contain',
+          backgroundColor: '#ffffff',
+        },
+      ],
+      [
+        'expo-build-properties',
+        {
+          android: {
+            extraMavenRepos: [
+              'https://devrepo.kakao.com/nexus/content/groups/public/',
+            ],
+            newArchEnabled: true,
+          },
+          ios: {
+            newArchEnabled: true,
+          },
+        },
+      ],
+      [
+        '@react-native-kakao/core',
+        {
+          nativeAppKey: process.env.KAKAO_NATIVE_APP_KEY,
+          android: {
+            authCodeHandlerActivity: true,
+          },
+          ios: {
+            handleKakaoOpenUrl: true,
+          },
+        },
+      ],
+    ],
     experiments: {
       typedRoutes: true,
     },
@@ -49,6 +84,7 @@ export default {
     },
     extra: {
       API_URL: process.env.API_URL,
+      KAKAO_NATIVE_APP_KEY: process.env.KAKAO_NATIVE_APP_KEY,
     },
   },
 };
