@@ -1,4 +1,5 @@
 import { AppText } from '@/components/AppText';
+import { useSetNicknameMutation } from '@/hooks/querys/user.query';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Entypo, EvilIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -17,6 +18,7 @@ export default function NicknameScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [nickname, setNickname] = useState('');
+  const { setNickname: setNicknameMutation } = useSetNicknameMutation();
   return (
     <SafeAreaView className='flex-1'>
       <KeyboardAvoidingView
@@ -78,7 +80,9 @@ export default function NicknameScreen() {
             className='absolute bottom-5 right-5'
             onPress={() => {
               if (nickname.trim()) {
-                router.push('/role');
+                setNickname(nickname);
+                setNicknameMutation(nickname);
+                router.push('/(protected)/(tabs)/(home)');
               }
             }}
             disabled={!nickname.trim()}

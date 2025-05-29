@@ -3,7 +3,7 @@ import { AppText } from '@/components/AppText';
 import AuthInput from '@/components/auth/AuthInput';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAuthStore } from '@/store/authStore';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Keyboard,
@@ -65,7 +65,7 @@ export default function LoginScreen() {
     setError('');
     login(emailTrimmed, password)
       .then(({ user, jwt }) => logIn(user, jwt))
-      .then(() => console.log('로그인 성공'))
+      .then(() => router.replace('/(protected)/(tabs)/(home)'))
       .catch((err: any) => {
         console.error(err);
         setError(err.response?.data?.message || err.message || '로그인 실패');
