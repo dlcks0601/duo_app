@@ -1,4 +1,4 @@
-import GoogleLoginMutation from '@/hooks/querys/auth.query';
+import { useGoogleLoginMutation } from '@/hooks/querys/auth.query';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, TouchableOpacity, View } from 'react-native';
 import GoogleLogo from '../GoogleLogo';
@@ -10,7 +10,7 @@ interface GoogleLoginButtonProps {
 export default function GoogleLoginButton({ onPress }: GoogleLoginButtonProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { login } = GoogleLoginMutation();
+  const { login } = useGoogleLoginMutation();
 
   return (
     <TouchableOpacity
