@@ -1,4 +1,5 @@
 import { API_URL } from '@/constants/config';
+import { useAuthStore } from '@/store/authStore';
 import axios, { AxiosError } from 'axios';
 
 export const axiosInstance = axios.create({
@@ -9,14 +10,13 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// 요청
 axiosInstance.interceptors.request.use(
   (config) => {
-    // TODO: 토큰이 필요한 경우 여기서 추가
-    // const token = await getToken();
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const { jwt } = useAuthStore.getState();
+    const accessToken = jwt.accessToken;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return config;
   },
   (error: AxiosError) => {
@@ -24,14 +24,43 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// 응답
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    // TODO: 에러 처리 로직 추가
-    // if (error.response?.status === 401) {
-    //   // 토큰 만료 처리
-    // }
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && originalRequest) {
+      console.log('🔑 토큰 만료됨, 리프레시 토큰으로 갱신 시도');
+      try {
+        const { jwt, logIn } = useAuthStore.getState();
+        const refreshToken = jwt.refreshToken;
+        if (!refreshToken) {
+          console.log('❌ 리프레시 토큰 없음');
+          throw new Error('No refresh token');
+        }
+        console.log('🔄 리프레시 토큰으로 새로운 토큰 요청');
+        const response = await axios.post(`${API_URL}/auth/refresh`, {
+          code: refreshToken,
+        });
+
+        const { accessToken, refreshToken: newRefreshToken } =
+          response.data.jwt;
+        console.log('✅ 새로운 토큰 발급 성공');
+
+        logIn(useAuthStore.getState().user, {
+          accessToken,
+          refreshToken: newRefreshToken,
+        });
+        console.log('💾 새로운 토큰 저장 완료');
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        console.log('🔄 실패했던 요청 재시도');
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        console.log('❌ 리프레시 토큰 갱신 실패:', refreshError);
+        useAuthStore.getState().logOut();
+        return Promise.reject(refreshError);
+      }
+    }
     return Promise.reject(error);
   }
 );
