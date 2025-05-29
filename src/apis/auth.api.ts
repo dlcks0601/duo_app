@@ -14,17 +14,15 @@ export const login = async (email: string, password: string) => {
   return response.data;
 };
 
-export const signup = async (email: string, password: string, role: string) => {
+export const signup = async (email: string, password: string) => {
   const response = await fetcher<SignupResponse>({
-    url: '/auth/signup',
+    url: '/auth/register',
     method: 'POST',
     data: {
       email,
       password,
-      role,
     },
   });
-  console.log(response.data);
   return response.data;
 };
 

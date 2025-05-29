@@ -4,13 +4,13 @@ export interface AuthState {
   user: User;
   jwt: TokenResponse;
   logIn: (user: User, jwt: TokenResponse) => void;
+  updateNickname: (nickname: string) => void;
   logOut: () => void;
 }
 
 export interface User {
   id?: string;
   nickname: string;
-  role: string;
 }
 
 export interface MessageResponse {
@@ -30,6 +30,20 @@ export interface LoginResponse {
 }
 
 export interface SignupResponse {
+  message: MessageResponse;
+  user: User;
+  jwt: TokenResponse;
+}
+
+export interface SignupState {
+  isReady: boolean;
+  user: User;
+  jwt: TokenResponse;
+  logIn: (user: User, jwt: TokenResponse) => void;
+  setNickname: (nickname: string) => void;
+}
+
+export interface NicknameUpdateResponse {
   message: MessageResponse;
   user: User;
 }

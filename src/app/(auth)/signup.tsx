@@ -1,11 +1,9 @@
 import { AppText } from '@/components/AppText';
 import AuthInput from '@/components/auth/AuthInput';
+import { useSignupMutation } from '@/hooks/querys/auth.query';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useAuthStore } from '@/store/authStore';
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -26,7 +24,7 @@ export default function SignupScreen() {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { logIn } = useAuthStore();
+  const { signup } = useSignupMutation();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -47,6 +45,38 @@ export default function SignupScreen() {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  const handleSignup = () => {
+    const emailTrimmed = email.trim();
+    const isEmailEmpty = emailTrimmed === '';
+    const isPasswordEmpty = password === '';
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const isEmailValid = emailRegex.test(emailTrimmed);
+
+    setEmailError(!isEmailValid);
+    setPasswordError(isPasswordEmpty);
+
+    if (isEmailEmpty || isPasswordEmpty) {
+      setError('이메일과 패스워드를 모두 입력해주세요.');
+      return;
+    }
+
+    if (!isEmailValid) {
+      setError('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    try {
+      signup({ email: emailTrimmed, password });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.message || err.message || '회원가입 실패');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -69,28 +99,40 @@ export default function SignupScreen() {
               </View>
               {/* 회원가입 폼 */}
               <View className='flex-col w-full mt-10 gap-2'>
-                <AuthInput
-                  label='이메일'
-                  placeholder='이메일을 입력해주세요.'
-                  value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    if (text.trim()) setEmailError(false);
-                  }}
-                  keyboardType='default'
-                  required
-                />
-                <AuthInput
-                  label='패스워드'
-                  placeholder='패스워드를 입력해주세요.'
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    if (text) setPasswordError(false);
-                  }}
-                  secureTextEntry
-                  required
-                />
+                <View className='flex-col w-full h-[100px]'>
+                  <AuthInput
+                    label='이메일'
+                    placeholder='이메일을 입력해주세요.'
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (text.trim()) setEmailError(false);
+                    }}
+                    keyboardType='email-address'
+                    required
+                    error={
+                      emailError ? '올바른 이메일 형식이 아닙니다.' : undefined
+                    }
+                  />
+                  {emailError && (
+                    <Text className='text-red-500 text-sm mt-[-10px]'>
+                      올바른 이메일 형식이 아닙니다.
+                    </Text>
+                  )}
+                </View>
+                <View className='flex-col w-full'>
+                  <AuthInput
+                    label='패스워드'
+                    placeholder='패스워드를 입력해주세요.'
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (text) setPasswordError(false);
+                    }}
+                    secureTextEntry
+                    required
+                  />
+                </View>
               </View>
 
               {/* 다음 버튼 */}
@@ -98,18 +140,7 @@ export default function SignupScreen() {
                 {email && password ? (
                   <TouchableOpacity
                     className={`rounded-md py-5 ${isDark ? 'bg-white' : 'bg-black'}`}
-                    onPress={() => {
-                      Alert.alert('회원가입', '다음 단계로 이동하시겠습니까?', [
-                        {
-                          text: '취소',
-                          style: 'destructive',
-                        },
-                        {
-                          text: '확인',
-                          onPress: () => router.push('/nickname'),
-                        },
-                      ]);
-                    }}
+                    onPress={handleSignup}
                   >
                     <Text
                       className={`${isDark ? 'text-black' : 'text-white'} text-center`}
